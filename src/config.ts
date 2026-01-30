@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import path from 'path';
+import os from 'os';
 import { Config } from './types/config.js';
 
 // Load .env from the parent directory (root of Hugo project)
@@ -15,6 +16,19 @@ export function getConfig(): Config {
   const commitPrefix = process.env.GIT_COMMIT_PREFIX || 'blog:';
   const contentDir = process.env.HUGO_CONTENT_DIR || 'content/posts';
   const defaultEditor = process.env.DEFAULT_EDITOR || 'code';
+
+  console.log('Raw contentDir:', contentDir);
+  console.log('os.homedir():', os.homedir());
+
+  const expandPath = (filePath: string): string => {
+    if (path.isAbsolute(filePath)) {
+      return filePath;
+    }
+    return path.join(os.homedir(), filePath);
+  };
+
+  const expandedContentDir = expandPath(contentDir);
+  console.log('Expanded contentDir:', expandedContentDir);
 
   if (!apiKey || !endpoint || !model) {
     throw new Error(
@@ -34,7 +48,7 @@ export function getConfig(): Config {
       commitPrefix,
     },
     hugo: {
-      contentDir,
+      contentDir: expandedContentDir,
       defaultEditor,
     },
   };
