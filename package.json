@@ -9,7 +9,7 @@
     "dev": "bun run --watch src/index.ts"
   },
   "bin": {
-    "blog": "./dist/index.js"
+    "blog-cli": "./dist/index.js"
   },
   "dependencies": {
     "commander": "^12.0.0",
