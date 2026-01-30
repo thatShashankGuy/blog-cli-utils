@@ -1,5 +1,4 @@
 export interface Config {
-  // LLM Configuration
   llm: {
     apiKey: string;
     endpoint: string;
@@ -7,17 +6,15 @@ export interface Config {
     siteUrl?: string;
     siteName?: string;
   };
-  
-  // Git Configuration
-  git: {
-    authorName: string;
-    authorEmail: string;
-    commitPrefix: string;
+
+  github: {
+    owner: string;
+    repo: string;
+    token: string;
+    branch: string;
+    contentPath: string;
+    url?: string;
   };
-  
-  // Hugo Configuration
-  hugo: {
-    contentDir: string;
-    defaultEditor: string;
-  };
+
+  author: string;
 }

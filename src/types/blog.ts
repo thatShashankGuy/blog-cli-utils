@@ -1,22 +1,8 @@
-export interface BlogPost {
-  title: string;
-  date: string;
-  author?: string;
-  tags?: string[];
-  categories?: string[];
-  draft: boolean;
-  slug: string;
-  filename: string;
-  content: string;
-}
-
 export interface BlogPostMetadata {
   title: string;
-  date?: string;
-  author?: string;
-  tags?: string[];
-  categories?: string[];
-  draft?: boolean;
+  author: string;
+  date: string;
+  draft: boolean;
 }
 
 export interface PostListItem {
@@ -24,5 +10,4 @@ export interface PostListItem {
   title: string;
   date: string;
   draft: boolean;
-  tags?: string[];
 }

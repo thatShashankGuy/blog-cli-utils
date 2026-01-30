@@ -1,4 +1,8 @@
-import { select, text, confirm, multiselect } from '@clack/prompts';
+import { text, confirm } from '@clack/prompts';
+import { execSync } from 'child_process';
+import fs from 'fs/promises';
+import os from 'os';
+import path from 'path';
 
 export async function promptTitle(): Promise<string> {
   const title = await text({
@@ -18,78 +22,17 @@ export async function promptTitle(): Promise<string> {
   return title;
 }
 
-export async function promptTags(): Promise<string[]> {
-  const useTags = await confirm({
-    message: 'Would you like to add tags?',
+export async function promptDraftStatus(): Promise<boolean> {
+  const isDraft = await confirm({
+    message: 'Set as draft?',
     initialValue: false
   });
 
-  if (typeof useTags !== 'boolean' || !useTags) return [];
-
-  const tags = await text({
-    message: 'Enter tags (comma-separated):',
-    placeholder: 'typescript, programming, tutorial'
-  });
-
-  if (typeof tags !== 'string' || !tags.trim()) return [];
-
-  return tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-}
-
-export async function promptCategories(): Promise<string[]> {
-  const useCategories = await confirm({
-    message: 'Would you like to add categories?',
-    initialValue: false
-  });
-
-  if (typeof useCategories !== 'boolean' || !useCategories) return [];
-
-  const categories = await text({
-    message: 'Enter categories (comma-separated):',
-    placeholder: 'Programming, Web Development'
-  });
-
-  if (typeof categories !== 'string' || !categories.trim()) return [];
-
-  return categories.split(',').map(cat => cat.trim()).filter(cat => cat.length > 0);
-}
-
-export async function promptAuthor(defaultAuthor?: string): Promise<string | undefined> {
-  const useAuthor = await confirm({
-    message: 'Would you like to set an author?',
-    initialValue: !!defaultAuthor
-  });
-
-  if (typeof useAuthor !== 'boolean' || !useAuthor) return undefined;
-
-  const author = await text({
-    message: 'Enter author name:',
-    placeholder: defaultAuthor || 'John Doe',
-    defaultValue: defaultAuthor
-  });
-
-  if (typeof author !== 'string') return undefined;
-
-  return author.trim();
-}
-
-export async function promptRawText(): Promise<string> {
-  const rawText = await text({
-    message: 'Enter your raw thoughts (press Enter when done):',
-    placeholder: 'Type or paste your thoughts here...',
-    validate: (value) => {
-      if (!value || value.trim().length === 0) {
-        return 'Raw text is required for AI generation';
-      }
-      return undefined;
-    }
-  });
-
-  if (typeof rawText !== 'string') {
-    throw new Error('Raw text is required');
+  if (typeof isDraft !== 'boolean') {
+    throw new Error('Draft status is required');
   }
 
-  return rawText;
+  return isDraft;
 }
 
 export async function promptConfirmation(message: string): Promise<boolean> {
@@ -105,15 +48,54 @@ export async function promptConfirmation(message: string): Promise<boolean> {
   return confirmed === true;
 }
 
-export async function promptFileSelection(files: Array<{ name: string; value: string }>): Promise<string> {
-  const selected = await select({
-    message: 'Select a file:',
-    options: files
-  });
+export async function openEditorForText(): Promise<string> {
+  const editor = process.env.EDITOR;
 
-  if (typeof selected !== 'string') {
-    throw new Error('File selection is required');
+  if (!editor) {
+    throw new Error(
+      'EDITOR environment variable is not set. ' +
+      'Please set it in your shell configuration (e.g., export EDITOR=code) ' +
+      'or run: blog-cli --help for setup instructions.'
+    );
   }
 
-  return selected;
+  const tempDir = os.tmpdir();
+  const tempFilePath = path.join(tempDir, `blog-post-${Date.now()}.md`);
+
+  const instructions = `# Blog Post Raw Content
+
+Write your blog post content here in plain text. This will be formatted by AI later.
+
+Tips:
+- Write naturally, don't worry about formatting
+- Include all your key points and ideas
+- Use paragraphs to separate main thoughts
+- The AI will add headings, improve structure, and enhance readability
+
+---
+Remove this header section and start writing below:
+`;
+
+  await fs.writeFile(tempFilePath, instructions, 'utf-8');
+
+  try {
+    execSync(`${editor} "${tempFilePath}"`, { stdio: 'inherit' });
+  } catch (error) {
+    await fs.unlink(tempFilePath);
+    throw new Error(`Editor failed to open: ${editor}`);
+  }
+
+  const content = await fs.readFile(tempFilePath, 'utf-8');
+
+  await fs.unlink(tempFilePath);
+
+  const cleanedContent = content
+    .replace(/# Blog Post Raw Content[\s\S]*?---\n?/, '')
+    .trim();
+
+  if (!cleanedContent || cleanedContent.length === 0) {
+    throw new Error('No content written. Please write some content in the editor.');
+  }
+
+  return cleanedContent;
 }

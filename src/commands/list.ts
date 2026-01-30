@@ -1,7 +1,7 @@
-import path from "path";
 import { getConfig } from "../config.js";
 import * as fileUtils from "../utils/file.js";
-import { intro, outro, log } from "@clack/prompts";
+import { GitHubAPI } from "../utils/github.js";
+import { intro, outro, log, spinner } from "@clack/prompts";
 import { PostListItem } from "../types/blog.js";
 
 export async function listPosts(
@@ -11,31 +11,37 @@ export async function listPosts(
 
   try {
     const config = getConfig();
-    const postsPath = config.hugo.contentDir;
-    const files = await fileUtils.listMarkdownFiles(postsPath);
+    const github = new GitHubAPI(config.github);
+
+    const s = spinner();
+    s.start('Fetching posts from GitHub...');
+
+    const files = await github.listMarkdownFiles();
 
     if (files.length === 0) {
+      s.stop('No blog posts found');
       log.info("No blog posts found");
       outro("Done");
       return;
     }
 
+    s.stop(`Found ${files.length} posts`);
+
     // Parse all posts
     const posts: PostListItem[] = [];
     for (const file of files) {
       try {
-        const content = await fileUtils.readFile(file);
+        const content = await github.getFile(file.path);
         const { metadata } = fileUtils.parseFrontmatter(content);
 
         posts.push({
-          filename: path.basename(file),
+          filename: file.name,
           title: metadata.title || "Untitled",
           date: metadata.date || new Date().toISOString(),
           draft: metadata.draft === true,
-          tags: metadata.tags || [],
         });
       } catch (error) {
-        console.error(`Error parsing ${file}:`, error);
+        console.error(`Error parsing ${file.name}:`, error);
       }
     }
 
@@ -64,13 +70,9 @@ export async function listPosts(
     filteredPosts.forEach((post, index) => {
       const status = post.draft ? "📝 Draft" : "✅ Published";
       const date = new Date(post.date).toLocaleDateString();
-      const tags =
-        post.tags && post.tags.length > 0
-          ? `\n   Tags: ${post.tags.join(", ")}`
-          : "";
 
       console.log(`${index + 1}. ${status} - ${post.title}`);
-      console.log(`   Date: ${date} | File: ${post.filename}${tags}`);
+      console.log(`   Date: ${date} | File: ${post.filename}`);
       console.log("");
     });
 
