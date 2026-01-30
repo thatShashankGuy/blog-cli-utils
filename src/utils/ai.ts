@@ -26,12 +26,22 @@ export async function callLLM(config: LLMConfig, prompt: string): Promise<string
   };
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.apiKey}`
+    };
+
+    if (config.siteUrl) {
+      headers['HTTP-Referer'] = config.siteUrl;
+    }
+
+    if (config.siteName) {
+      headers['X-Title'] = config.siteName;
+    }
+
     const response = await fetch(config.endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.apiKey}`
-      },
+      headers,
       body: JSON.stringify(request)
     });
 

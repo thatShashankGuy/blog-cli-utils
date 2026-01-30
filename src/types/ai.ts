@@ -31,4 +31,6 @@ export interface LLMConfig {
   apiKey: string;
   endpoint: string;
   model: string;
+  siteUrl?: string;
+  siteName?: string;
 }

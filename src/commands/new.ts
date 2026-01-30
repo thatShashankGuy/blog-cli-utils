@@ -67,7 +67,7 @@ export async function newPost(aiMode: boolean = false): Promise<void> {
     // Generate filename and path
     const filename = fileUtils.generateFilename(title);
     const contentDir = config.hugo.contentDir;
-    const filePath = path.join(process.cwd(), contentDir, filename);
+    const filePath = path.join(contentDir, filename);
 
     // Check if file already exists
     if (await fileUtils.fileExists(filePath)) {

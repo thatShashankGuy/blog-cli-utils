@@ -1,6 +1,7 @@
 # Blog CLI
 
-A powerful CLI tool for Hugo blog automation with AI-powered content generation support. Built with Bun and TypeScript for speed and maintainability.
+I build this tool  to automate  my blog writing using terminal.
+Built with Bun and TypeScript. All AI generated boilerplate code and documentation is reviewed and project is WIP. 
 
 ## Features
 
@@ -29,6 +30,23 @@ A powerful CLI tool for Hugo blog automation with AI-powered content generation 
 bun install
 ```
 
+4. (Optional) Link globally to use `blog-cli` command from anywhere:
+
+```bash
+bun run build
+bun link
+```
+
+After linking, you can use `blog-cli` instead of `bun run cli`:
+
+```bash
+# Without linking
+bun run cli list
+
+# After linking
+blog-cli list
+```
+
 ## Configuration
 
 ### 1. Set Up Environment Variables
@@ -46,6 +64,10 @@ Edit the `.env` file with your configuration:
 LLM_API_KEY=your_api_key_here
 LLM_API_ENDPOINT=https://api.your-provider.com/v1/chat/completions
 LLM_MODEL=your-model-name
+
+# Optional: For OpenRouter (helps with rankings)
+OPENROUTER_SITE_URL=https://yourblog.com
+OPENROUTER_SITE_NAME=Your Blog Name
 
 # Git Configuration
 GIT_AUTHOR_NAME="Your Name"
@@ -73,6 +95,17 @@ LLM_MODEL=gpt-4
 LLM_API_KEY=sk-ant-...
 LLM_API_ENDPOINT=https://api.anthropic.com/v1/messages
 LLM_MODEL=claude-3-sonnet-20240229
+```
+
+#### OpenRouter
+```env
+LLM_API_KEY=sk-or-...
+LLM_API_ENDPOINT=https://openrouter.ai/api/v1/chat/completions
+LLM_MODEL=openai/gpt-4
+
+# Optional: For OpenRouter rankings (recommended)
+OPENROUTER_SITE_URL=https://yourblog.com
+OPENROUTER_SITE_NAME=Your Blog Name
 ```
 
 #### Other Providers

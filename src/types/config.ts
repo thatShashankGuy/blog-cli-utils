@@ -4,6 +4,8 @@ export interface Config {
     apiKey: string;
     endpoint: string;
     model: string;
+    siteUrl?: string;
+    siteName?: string;
   };
   
   // Git Configuration

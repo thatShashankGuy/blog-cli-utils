@@ -57,3 +57,6 @@ bun.lockb
 # OS
 .DS_Store
 Thumbs.db
+
+#project
+.temp.txt

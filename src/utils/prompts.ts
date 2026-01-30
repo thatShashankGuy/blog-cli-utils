@@ -24,7 +24,7 @@ export async function promptTags(): Promise<string[]> {
     initialValue: false
   });
 
-  if (!useTags) return [];
+  if (typeof useTags !== 'boolean' || !useTags) return [];
 
   const tags = await text({
     message: 'Enter tags (comma-separated):',
@@ -42,7 +42,7 @@ export async function promptCategories(): Promise<string[]> {
     initialValue: false
   });
 
-  if (!useCategories) return [];
+  if (typeof useCategories !== 'boolean' || !useCategories) return [];
 
   const categories = await text({
     message: 'Enter categories (comma-separated):',
@@ -60,7 +60,7 @@ export async function promptAuthor(defaultAuthor?: string): Promise<string | und
     initialValue: !!defaultAuthor
   });
 
-  if (!useAuthor) return undefined;
+  if (typeof useAuthor !== 'boolean' || !useAuthor) return undefined;
 
   const author = await text({
     message: 'Enter author name:',
@@ -97,6 +97,10 @@ export async function promptConfirmation(message: string): Promise<boolean> {
     message,
     initialValue: true
   });
+
+  if (typeof confirmed !== 'boolean') {
+    throw new Error('Operation cancelled');
+  }
 
   return confirmed === true;
 }

@@ -16,9 +16,8 @@ export function getConfig(): Config {
   const commitPrefix = process.env.GIT_COMMIT_PREFIX || 'blog:';
   const contentDir = process.env.HUGO_CONTENT_DIR || 'content/posts';
   const defaultEditor = process.env.DEFAULT_EDITOR || 'code';
-
-  console.log('Raw contentDir:', contentDir);
-  console.log('os.homedir():', os.homedir());
+  const siteUrl = process.env.OPENROUTER_SITE_URL;
+  const siteName = process.env.OPENROUTER_SITE_NAME;
 
   const expandPath = (filePath: string): string => {
     if (path.isAbsolute(filePath)) {
@@ -28,7 +27,6 @@ export function getConfig(): Config {
   };
 
   const expandedContentDir = expandPath(contentDir);
-  console.log('Expanded contentDir:', expandedContentDir);
 
   if (!apiKey || !endpoint || !model) {
     throw new Error(
@@ -41,6 +39,8 @@ export function getConfig(): Config {
       apiKey,
       endpoint,
       model,
+      siteUrl,
+      siteName,
     },
     git: {
       authorName: authorName || '',
