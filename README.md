@@ -123,12 +123,17 @@ Transform your plain text into a well-structured blog post:
 blog-cli new --ai
 ```
 
+**Testing mode** (skip AI formatting):
+```bash
+blog-cli new --ai --no-ai
+```
+
 The wizard will:
 1. Prompt for title
 2. Prompt for draft status (default: published)
 3. Open your editor for plain text input
-4. Send plain text to AI for formatting
-5. Show you a preview
+4. Send plain text to AI for formatting (skip with `--no-ai`)
+5. Show you a preview (skip with `--no-ai`)
 6. Upload to GitHub with metadata
 
 **Metadata Format:**
@@ -196,10 +201,26 @@ blog-cli --help
    - Review the preview
    - Confirm to upload
 
-4. **Uploaded to GitHub**:
-   - File saved as `title.md`
-   - Metadata added automatically
-   - Ready for your site to process
+ 4. **Uploaded to GitHub**:
+    - File saved as `title.md`
+    - Metadata added automatically
+    - Ready for your site to process
+
+### Testing Workflow
+
+Test the CLI without invoking AI API (useful for development/debugging):
+
+```bash
+blog-cli new --ai --no-ai
+```
+
+This will:
+1. Prompt for title
+2. Prompt for draft status
+3. Open your editor for plain text
+4. **Skip AI formatting** (use raw editor content)
+5. Show preview (skipped)
+6. Upload raw content to GitHub
 
 ## Project Structure
 

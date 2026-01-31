@@ -15,14 +15,19 @@ program
   .command('new')
   .description('Create a new blog post using AI')
   .option('--ai', 'Use AI to format your plain text (default mode)')
+  .option('--no-ai', 'Skip AI formatting (for testing, uses raw editor content)')
   .action(async (options) => {
-    if (!options.ai) {
+    const noAi = process.argv.includes('--no-ai');
+    const hasAi = process.argv.includes('--ai');
+
+    if (!hasAi && !noAi) {
       console.log('⚠️  --ai is required. Creating posts without AI is not supported.');
       console.log('   Usage: blog-cli new --ai');
+      console.log('   Testing mode: blog-cli new --ai --no-ai');
       console.log('   Or run: blog-cli --help for setup instructions');
       process.exit(1);
     }
-    await newPost();
+    await newPost(noAi);
   });
 
 program
@@ -40,11 +45,6 @@ program
 program
   .command('help')
   .description('Show setup and usage guide')
-  .action(() => {
-    showSetupGuide();
-  });
-
-program.option('--help', 'Show setup and usage guide')
   .action(() => {
     showSetupGuide();
   });
@@ -112,28 +112,32 @@ function showSetupGuide() {
 📝 USAGE
 ───────────────────────────────────────────────────────────────────────
 
-Create a new post:
-  blog-cli new --ai
+ Create a new post:
+   blog-cli new --ai
+ 
+   This will:
+   1. Prompt for title
+   2. Prompt for draft status (default: published)
+   3. Open your editor for plain text input
+   4. Format text with AI
+   5. Upload to GitHub
 
-  This will:
-  1. Prompt for title
-  2. Prompt for draft status (default: published)
-  3. Open your editor for plain text input
-  4. Format text with AI
-  5. Upload to GitHub
+   Testing mode (skip AI):
+   blog-cli new --ai --no-ai
 
 List all posts:
   blog-cli list                    # Show all posts
   blog-cli list --drafts          # Show only drafts
   blog-cli list --published       # Show only published
 
-💡 TIPS
-───────────────────────────────────────────────────────────────────────
-• Write naturally in the editor, no formatting needed
-• AI will add headings and improve structure
-• Draft posts won't be visible on your live site
-• Set draft: true to keep posts private until ready
-• Duplicate filenames will cause an error
+ 💡 TIPS
+ ───────────────────────────────────────────────────────────────────────
+ • Write naturally in the editor, no formatting needed
+ • AI will add headings and improve structure
+ • Draft posts won't be visible on your live site
+ • Set draft: true to keep posts private until ready
+ • Duplicate filenames will cause an error
+ • Use --no-ai flag to test without calling AI API
 
 ❓ TROUBLESHOOTING
 ───────────────────────────────────────────────────────────────────────

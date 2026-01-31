@@ -33,6 +33,13 @@ export function getConfig(): Config {
       parsedRepo = match[2];
       githubApiUrl = githubUrl.replace(/\.git$/, '');
     }
+  } else if (githubOwner && githubRepo) {
+    // Check if repo value looks like a full URL (user error)
+    if (githubRepo.includes('github.com')) {
+      throw new Error(
+        'GITHUB_REPO should not be a full URL. Use GITHUB_URL instead (e.g., https://github.com/owner/repo.git)'
+      );
+    }
   }
 
   if (!apiKey || !endpoint || !model) {
